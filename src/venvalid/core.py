@@ -23,8 +23,6 @@ def venvalid(
 
     Returns:
         dict: Validated and converted environment variables.
-
-        Translated with DeepL.com (free version)
     """
     if source is None:
         load_env_file(dotenv_path, override=dotenv_override)
@@ -47,7 +45,7 @@ def venvalid(
 
 def _resolve_variable(key: str, raw: str | None, spec: object) -> object:
     """
-    Resolve e valida uma variável de ambiente com base em sua especificação.
+    Resolves and validates an environment variable based on its specification.
     """
     # Case enum-style: ["dev", "prod"]
     if isinstance(spec, list):
