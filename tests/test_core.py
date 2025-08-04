@@ -8,12 +8,12 @@ from src.venvalid import (
     bool_,
     datetime_,
     decimal_,
-    env,
     int_,
     json_,
     list_,
     path_,
     str_,
+    venvalid,
 )
 
 
@@ -22,7 +22,7 @@ def test_basic_types(monkeypatch):
     monkeypatch.setenv("PORT", "8000")
     monkeypatch.setenv("SECRET", "abc123")
 
-    config = env({"DEBUG": bool, "PORT": int, "SECRET": str})
+    config = venvalid({"DEBUG": bool, "PORT": int, "SECRET": str})
 
     assert config["DEBUG"] is True
     assert config["PORT"] == 8000
@@ -31,66 +31,66 @@ def test_basic_types(monkeypatch):
 
 def test_list_type(monkeypatch):
     monkeypatch.setenv("HOSTS", "a.com, b.com ,c.com")
-    config = env({"HOSTS": list})
+    config = venvalid({"HOSTS": list})
     assert config["HOSTS"] == ["a.com", "b.com", "c.com"]
 
 
 def test_enum_values(monkeypatch):
     monkeypatch.setenv("MODE", "prod")
-    config = env({"MODE": ["dev", "prod", "test"]})
+    config = venvalid({"MODE": ["dev", "prod", "test"]})
     assert config["MODE"] == "prod"
 
 
 def test_allowed_values(monkeypatch):
     monkeypatch.setenv("REGION", "us")
-    config = env({"REGION": (str, {"allowed": ["us", "eu"]})})
+    config = venvalid({"REGION": (str, {"allowed": ["us", "eu"]})})
     assert config["REGION"] == "us"
 
 
 def test_default_value(monkeypatch):
     monkeypatch.delenv("ENV", raising=False)
-    config = env({"ENV": (str, {"default": "dev"})})
+    config = venvalid({"ENV": (str, {"default": "dev"})})
     assert config["ENV"] == "dev"
 
 
 def test_validate_function(monkeypatch):
     monkeypatch.setenv("PORT", "8080")
-    config = env({"PORT": (int, {"validate": lambda x: 1024 <= x <= 65535})})
+    config = venvalid({"PORT": (int, {"validate": lambda x: 1024 <= x <= 65535})})
     assert config["PORT"] == 8080
 
 
 def test_missing_required(monkeypatch):
     monkeypatch.delenv("MISSING", raising=False)
     with pytest.raises(SystemExit):
-        env({"MISSING": str})
+        venvalid({"MISSING": str})
 
 
 def test_enum_invalid(monkeypatch):
     monkeypatch.setenv("MODE", "invalid")
     with pytest.raises(SystemExit):
-        env({"MODE": ["dev", "prod", "test"]})
+        venvalid({"MODE": ["dev", "prod", "test"]})
 
 
 def test_allowed_invalid(monkeypatch):
     monkeypatch.setenv("REGION", "asia")
     with pytest.raises(SystemExit):
-        env({"REGION": (str, {"allowed": ["us", "eu"]})})
+        venvalid({"REGION": (str, {"allowed": ["us", "eu"]})})
 
 
 def test_invalid_cast(monkeypatch):
     monkeypatch.setenv("PORT", "not-a-number")
     with pytest.raises(SystemExit):
-        env({"PORT": int})
+        venvalid({"PORT": int})
 
 
 def test_failed_custom_validation(monkeypatch):
     monkeypatch.setenv("PORT", "80")
     with pytest.raises(SystemExit):
-        env({"PORT": (int, {"validate": lambda x: x >= 1024})})
+        venvalid({"PORT": (int, {"validate": lambda x: x >= 1024})})
 
 
 def test_helpers_with_custom_source():
-    config = env(
+    config = venvalid(
         {
             "TIMEOUT": int_(default=30),
             "ENABLED": bool_(default=True),

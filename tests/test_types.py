@@ -8,12 +8,12 @@ from src.venvalid import (
     bool_,
     datetime_,
     decimal_,
-    env,
     int_,
     json_,
     list_,
     path_,
     str_,
+    venvalid,
 )
 
 
@@ -62,59 +62,59 @@ def test_json_helper_structure():
 
 def test_int_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("PORT", "8080")
-    config = env({"PORT": int_(default=8000)})
+    config = venvalid({"PORT": int_(default=8000)})
     assert config["PORT"] == 8080
 
 
 def test_bool_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("DEBUG", "yes")
-    config = env({"DEBUG": bool_(default=False)})
+    config = venvalid({"DEBUG": bool_(default=False)})
     assert config["DEBUG"] is True
 
 
 def test_path_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("LOG_PATH", "/var/log.txt")
-    config = env({"LOG_PATH": path_()})
+    config = venvalid({"LOG_PATH": path_()})
     assert config["LOG_PATH"] == Path("/var/log.txt")
 
 
 def test_decimal_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("TAX", "19.75")
-    config = env({"TAX": decimal_()})
+    config = venvalid({"TAX": decimal_()})
     assert config["TAX"] == Decimal("19.75")
 
 
 def test_datetime_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("START_TIME", "2025-01-01T00:00:00")
-    config = env({"START_TIME": datetime_()})
+    config = venvalid({"START_TIME": datetime_()})
     assert config["START_TIME"] == datetime(2025, 1, 1)
 
 
 def test_json_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("SETTINGS", '{"mode": "dark"}')
-    config = env({"SETTINGS": json_()})
+    config = venvalid({"SETTINGS": json_()})
     assert config["SETTINGS"] == {"mode": "dark"}
 
 
 def test_list_helper_used_in_env(monkeypatch):
     monkeypatch.setenv("HOSTS", "a.com,b.com , c.com")
-    config = env({"HOSTS": list_()})
+    config = venvalid({"HOSTS": list_()})
     assert config["HOSTS"] == ["a.com", "b.com", "c.com"]
 
 
 def test_int_helper_invalid_value(monkeypatch):
     monkeypatch.setenv("PORT", "not-a-number")
     with pytest.raises(SystemExit):
-        env({"PORT": int_()})
+        venvalid({"PORT": int_()})
 
 
 def test_json_helper_invalid(monkeypatch):
     monkeypatch.setenv("SETTINGS", "{invalid json}")
     with pytest.raises(SystemExit):
-        env({"SETTINGS": json_()})
+        venvalid({"SETTINGS": json_()})
 
 
 def test_custom_validation_fails(monkeypatch):
     monkeypatch.setenv("PORT", "80")
     with pytest.raises(SystemExit):
-        env({"PORT": int_(validate=lambda x: x >= 1024)})
+        venvalid({"PORT": int_(validate=lambda x: x >= 1024)})

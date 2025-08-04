@@ -1,11 +1,34 @@
 import os
 
-from src.venvalid.errors import EnvSafeError
+from .dotenv import load_env_file
+from .errors import EnvSafeError
+from .utils import _cast
 
 
-def env(
-    specs: dict[str, object], *, source: dict[str, str] | None = None
+def venvalid(
+    specs: dict[str, object],
+    *,
+    source: dict[str, str] | None = None,
+    dotenv_path: str = ".env",
+    dotenv_override: bool = False,
 ) -> dict[str, object]:
+    """
+    Validates and loads environment variables based on declarative specifications.
+
+    Args:
+        specs (dict): Variable specifications (type, default, etc).
+        source (dict, optional): Alternative source for the variables (default: os.environ).
+        dotenv_path (str, optional): Path to the .env file to be loaded.
+        dotenv_override (bool): If True, overwrites existing variables when loading .env.
+
+    Returns:
+        dict: Validated and converted environment variables.
+
+        Translated with DeepL.com (free version)
+    """
+    if source is None:
+        load_env_file(dotenv_path, override=dotenv_override)
+
     env_source = source or os.environ
     result: dict[str, object] = {}
 
@@ -23,8 +46,10 @@ def env(
 
 
 def _resolve_variable(key: str, raw: str | None, spec: object) -> object:
-    from .utils import _cast
-
+    """
+    Resolve e valida uma variável de ambiente com base em sua especificação.
+    """
+    # Case enum-style: ["dev", "prod"]
     if isinstance(spec, list):
         if raw is None:
             raise EnvSafeError(f"{key} is required and must be one of {spec}")
@@ -47,8 +72,10 @@ def _resolve_variable(key: str, raw: str | None, spec: object) -> object:
         default = options.get("default")
         allowed = options.get("allowed")
         validate = options.get("validate")
+
     elif isinstance(spec, type):
         expected_type = spec
+
     else:
         raise TypeError(f"{key}: invalid spec type {type(spec)}")
 

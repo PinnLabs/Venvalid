@@ -1,18 +1,9 @@
-from src.venvalid.core import env
-from src.venvalid.errors import EnvSafeError
-from src.venvalid.types import (
-    bool_,
-    datetime_,
-    decimal_,
-    int_,
-    json_,
-    list_,
-    path_,
-    str_,
-)
+from .core import venvalid
+from .errors import EnvSafeError
+from .types import bool_, datetime_, decimal_, int_, json_, list_, path_, str_
 
 __all__ = [
-    "env",
+    "venvalid",
     "EnvSafeError",
     "str_",
     "int_",
