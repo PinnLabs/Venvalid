@@ -32,6 +32,12 @@ Venvalid was designed with Python developers in mind, offering a modern, clean, 
 pip install venvalid
 ```
 
+or
+
+```bash
+uv add venvalid
+```
+
 ---
 
 ## Quick Example
