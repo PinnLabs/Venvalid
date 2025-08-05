@@ -107,7 +107,7 @@ All helpers accept:
 
 ---
 
-## 🛠️ Advanced Options
+## Advanced Options
 
 ```python
 "ENVIRONMENT": str_(allowed=["dev", "prod"], default="dev"),
