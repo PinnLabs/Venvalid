@@ -3,7 +3,7 @@ name: CI & Release
 on:
   push:
     branches:
-      - master 
+      - master
 
 jobs:
   test:
@@ -44,10 +44,14 @@ jobs:
           version=$(grep -m1 '^version =' pyproject.toml | cut -d'"' -f2)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Create Git tag
+      - name: Configure Git for pushing tags
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        
+      - name: Create and push tag
+        run: |
           git tag "v${{ steps.get_version.outputs.version }}"
           git push origin "v${{ steps.get_version.outputs.version }}"
 
