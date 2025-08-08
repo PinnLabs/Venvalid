@@ -11,8 +11,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent"
 ]
-dependencies = [
-    "poetry>=1.8.5",
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.1",
 ]
 
 [project.urls]
