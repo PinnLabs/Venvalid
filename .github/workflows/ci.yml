@@ -27,6 +27,9 @@ jobs:
       - name: Install uv
         run: pip install uv
 
+      - name: Create virtual environment
+        run: uv venv .venv
+
       - name: Install dependencies (with dev extras)
         run: uv pip install .[dev]
 
