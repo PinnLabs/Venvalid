@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - "v*" # Trigger release job when pushing a version tag
+      - "v*"
   pull_request:
     branches:
       - master
@@ -27,8 +27,8 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name: Install dependencies
-        run: uv add pytest
+      - name: Install dependencies (with dev extras)
+        run: uv pip install .[dev]
 
       - name: Run pytest
         run: uv run pytest --maxfail=1 --disable-warnings -q
