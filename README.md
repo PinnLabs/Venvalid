@@ -1,7 +1,7 @@
 <p align="center">
   <img src="./public/logo.png" alt="Venvalid logo" width="200"/>
 </p>
-<a href="https://pepy.tech/projects/venvalid"><img src="https://static.pepy.tech/badge/venvalid" alt="PyPI Downloads"></a>
+<a align="center" href="https://pepy.tech/projects/venvalid"><img src="https://static.pepy.tech/badge/venvalid" alt="PyPI Downloads"></a>
 <p align="center">Minimalist environment variable validation for Python, inspired by <a href="https://github.com/af/envalid">envalid</a></p>
 
 ---
