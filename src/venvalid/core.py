@@ -1,4 +1,7 @@
 import os
+from typing import Optional
+
+from rich.console import Console
 
 from .dotenv import load_env_file
 from .errors import EnvSafeError
@@ -8,9 +11,11 @@ from .utils import _cast
 def venvalid(
     specs: dict[str, object],
     *,
-    source: dict[str, str] | None = None,
+    source: Optional[dict[str, str]] = None,
     dotenv_path: str = ".env",
     dotenv_override: bool = False,
+    pretty: bool = False,
+    exit_on_error: bool = True,
 ) -> dict[str, object]:
     """
     Validates and loads environment variables based on declarative specifications.
@@ -20,9 +25,14 @@ def venvalid(
         source (dict, optional): Alternative source for the variables (default: os.environ).
         dotenv_path (str, optional): Path to the .env file to be loaded.
         dotenv_override (bool): If True, overwrites existing variables when loading .env.
+        pretty (bool): If True, uses rich to pretty-print errors.
+        exit_on_error (bool): If True, calls SystemExit(1) on validation errors (default=True for backwards compat).
 
     Returns:
         dict: Validated and converted environment variables.
+
+    Raises:
+        ValidationError: If exit_on_error=False and validation fails.
     """
     if source is None:
         load_env_file(dotenv_path, override=dotenv_override)
@@ -32,13 +42,19 @@ def venvalid(
 
     for key, spec in specs.items():
         raw_value = env_source.get(key)
-
         try:
             value = _resolve_variable(key, raw_value, spec)
             result[key] = value
         except EnvSafeError as e:
-            print(f"\n{e}\n")
-            raise SystemExit(1)
+            if pretty:
+                try:
+                    console = Console()
+                    console.print(f"[bold red]Error:[/bold red] {e}")
+                except ImportError:
+                    pass
+            if exit_on_error:
+                raise SystemExit(1)
+            raise
 
     return result
 
@@ -47,7 +63,6 @@ def _resolve_variable(key: str, raw: str | None, spec: object) -> object:
     """
     Resolves and validates an environment variable based on its specification.
     """
-    # Case enum-style: ["dev", "prod"]
     if isinstance(spec, list):
         if raw is None:
             raise EnvSafeError(f"{key} is required and must be one of {spec}")
@@ -62,18 +77,14 @@ def _resolve_variable(key: str, raw: str | None, spec: object) -> object:
 
     if isinstance(spec, tuple):
         t_candidate, options = spec
-
         if not isinstance(t_candidate, type):
             raise TypeError(f"{key}: expected a type, got {t_candidate}")
-
         expected_type = t_candidate
         default = options.get("default")
         allowed = options.get("allowed")
         validate = options.get("validate")
-
     elif isinstance(spec, type):
         expected_type = spec
-
     else:
         raise TypeError(f"{key}: invalid spec type {type(spec)}")
 

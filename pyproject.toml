@@ -11,6 +11,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent"
 ]
+dependencies = [
+    "pytest>=8.3.5",
+    "rich>=14.1.0",
+]
 
 [project.optional-dependencies]
 dev = [
