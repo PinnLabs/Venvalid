@@ -16,15 +16,20 @@ from src.venvalid.utils import _cast
         ("yes", True),
         ("on", True),
         ("false", False),
+        ("False", False),
         ("0", False),
         ("no", False),
         ("off", False),
-        ("", False),
-        ("maybe", False),  # unexpected value
     ],
 )
-def test_cast_bool(val, expected):
+def test_cast_bool_valid(val, expected):
     assert _cast(val, bool) == expected
+
+
+@pytest.mark.parametrize("val", ["", "maybe", "truth", "none"])
+def test_cast_bool_invalid(val):
+    with pytest.raises(ValueError):
+        _cast(val, bool)
 
 
 def test_cast_list_normal():
@@ -32,7 +37,7 @@ def test_cast_list_normal():
 
 
 def test_cast_list_empty():
-    assert _cast("", list) == [""]
+    assert _cast("", list) == []
 
 
 def test_cast_path():
@@ -45,12 +50,18 @@ def test_cast_decimal_valid():
 
 
 def test_cast_decimal_invalid():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         _cast("abc", Decimal)
 
 
-def test_cast_datetime_valid():
+def test_cast_datetime_valid_iso():
     assert _cast("2024-01-01T10:00:00", datetime) == datetime(2024, 1, 1, 10, 0, 0)
+
+
+def test_cast_datetime_valid_custom_format():
+    val = "01-02-2025 15:30"
+    fmt = "%d-%m-%Y %H:%M"
+    assert _cast(val, datetime, datetime_format=fmt) == datetime(2025, 2, 1, 15, 30)
 
 
 def test_cast_datetime_invalid():
@@ -62,7 +73,11 @@ def test_cast_dict_valid():
     assert _cast('{"debug": true, "port": 8000}', dict) == {"debug": True, "port": 8000}
 
 
-def test_cast_dict_invalid():
+def test_cast_list_json_valid():
+    assert _cast('["a", "b", "c"]', list) == ["a", "b", "c"]
+
+
+def test_cast_dict_invalid_json():
     with pytest.raises(ValueError):
         _cast("{not: valid}", dict)
 
@@ -89,11 +104,11 @@ def test_cast_float_valid():
 
 
 class Dummy:
-    pass
+    def __init__(self, v):
+        raise TypeError("Cannot instantiate Dummy with value")
 
 
 def test_cast_unknown_type():
     val = "123"
-    dummy_type = Dummy
-    with pytest.raises(TypeError):
-        _cast(val, dummy_type)
+    with pytest.raises(ValueError):
+        _cast(val, Dummy)
