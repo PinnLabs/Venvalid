@@ -30,9 +30,6 @@ def venvalid(
 
     Returns:
         dict: Validated and converted environment variables.
-
-    Raises:
-        ValidationError: If exit_on_error=False and validation fails.
     """
     if source is None:
         load_env_file(dotenv_path, override=dotenv_override)
