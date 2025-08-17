@@ -1,6 +1,6 @@
 [project]
 name = "venvalid"
-version = "0.2.0"
+version = "0.3.0"
 description = "A minimal and developer-friendly environment variable validator for Python, inspired by envalid."
 authors = [{ name = "PinnLabs", email = "it@pinnlabs.online" }]
 license = "MIT"
