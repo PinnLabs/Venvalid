@@ -1,4 +1,4 @@
-from .errors import EnvSafeError
+from src.venvalid.errors import EnvSafeError
 
 
 def validate_env_var(name: str, value: str | None):
