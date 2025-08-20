@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    target-branch: "master"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+    ignore:
+      - dependency-name: "poetry"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    assignees:
+      - "Dependabot"
+    reviewers:
+      - "castroofelipee"
+    labels:
+      - "dependencies"
+      - "auto-update"
